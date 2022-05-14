@@ -23,13 +23,12 @@ int main()
         printf("6. FJSSP Solution Proposal\n");
 
         if (scanf("%d", &option) > 0) {
-            system("cls");
+            system("cls"); // clear before an operation
             switch (option) {
             case 0: // add a job
                 break;
             case 1: // remove a job
-                system("cls");
-                newJobUserInput(jobListHead);
+                insertNodeListJob(&jobListHead, createNodeJob(jobListHead), NULL);
                 break;
             case 2:
                 break;
@@ -44,10 +43,10 @@ int main()
                 break;
             case 3: // Modify a job
                 break;
-            }
-        }
-        system("cls");
-    }
+            } // switch
+            system("cls"); // clear the screen after an operation
+        } // scanf
+    } // infinite loop
     system("pause");
     return 0;
 }

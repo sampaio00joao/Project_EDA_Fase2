@@ -67,47 +67,48 @@ job* readFile(job** jobListHead)
 void writeFile(operation* head){
 }
 
-// operation functions
-operation* createNode(int qt)
-{
+operation* createNodeOperation(operation* listOpHead, int machineAmount) {
     operation* node = (operation*)malloc(sizeof(operation));
+    int machineNumber = 0, machineOpTime = 0;
 
-    int inputMachine, inputOpTime;
-    int previousMachine = 0;
+    node->machineNumber = (int*)malloc(sizeof(int) * machineAmount);
+    node->machineOperationTime = (int*)malloc(sizeof(int) * machineAmount);
+    node->counter = machineAmount;
+    for (int i = 0; i < machineAmount; i++) {
+        printf("Machine Number: %d\n");
+        scanf("%d", &machineNumber);
+        printf("Machine Operation Time: %d\n");
+        scanf("%d", &machineOpTime);
+        node->machineNumber[i] = machineNumber;  // adds a machine
+        node->machineOperationTime[i] = machineOpTime;  // adds a machine
+    }//node creation loop
+    return node;
+}
+
+job* createNodeJob(job* jobListHead)
+{
+    int machineNumber = 0, machineOpTime = 0;
+    int operationQt = 0, machineAmount = 0;
     int counter = 0;
 
-    //aloccating space for the machines and their operation time.
-    node->machineNumber = (int*)malloc(sizeof(int) * qt);
-    node->machineOperationTime = (int*)malloc(sizeof(int) * qt);
+    job* temporary = (job*)malloc(sizeof(job));
+    temporary->operation = (operation*)malloc(sizeof(operation));
+    operation* auxiliar;
 
-    for (int i = 0; i < qt; i++) {
-        printf("Choose the machine to insert in the operation.\n");
-        if (scanf("%d", &inputMachine) > 0) { // check if the same number was chosen
-            if (previousMachine == inputMachine) {
-                printf("Machine already in use!\n");// block message
-                i--; // go back 
-            }
-            else { // if the number is different
-                printf("Choose the time of operation of machine %d:\n", inputMachine);
-                if (scanf("%d", &inputOpTime) > 0) {
-                    if (inputOpTime != 0) { // blocks the user from choosing a null time
-                        // adds the new node to the linked list
-                        node->machineNumber[i] = inputMachine;  // adds a machine
-                        node->machineOperationTime[i] = inputOpTime; //adds a operation time for the machine
-                        counter++;
-                        node->counter = counter;
-                        previousMachine = inputMachine; //update the previous machine to block if the same machine is chosen again
-                    }
-                    else {
-                        printf("Operation time cant be 0. Starting Over.\n"); // block message
-                        i--; // go back
-                    }
-                }
-            }
-        }
+    printf("How many operations?.\n");
+    if (scanf("%d", &operationQt) > 0);
+    if (operationQt > 0) { // wont accept 0 operations
+        for (int i = 0; i < operationQt; i++) { // ask for data
+            printf("\nOperation %d:\nHow many machines?\n", i + 1);
+            if (scanf("%d", &machineAmount) > 0);
+            if (machineAmount > 0) { // wont accept 0 machines
+                auxiliar = createNodeOperation(temporary->operation, machineAmount);
+                insertNodeListOp(temporary->operation, auxiliar, NULL);
+            }//machineAmount scanf
+        }//for loop operation quantity
     }
-    return node;
-} // createNode
+    return temporary;
+} // createNodeJob
 
 operation* createNodeFile(int* valueReadMachine, int* valueReadOpTime, int qt)
 {
@@ -142,8 +143,8 @@ operation* insertAtHead(operation** head, operation* node_to_insert, int qt)
     return node_to_insert; // returns the node inserted at the head of the list
 }
 
-operation* insertNodeList(operation** head, operation* node_to_insert, operation* position) {
-
+operation* insertNodeListOp(operation** head, operation* node_to_insert, operation* position) {
+    
     operation* lastNode = *head; // the last node points to the head of the list
 
     if (*head == NULL) { // if the list doesnt have anything yet
@@ -156,7 +157,6 @@ operation* insertNodeList(operation** head, operation* node_to_insert, operation
         return node_to_insert;
     }
     else { // if the list already as one value / and no position was specified
-        operation* lastNode = *head; // the last node points to the head of the list
         while (lastNode->next != NULL) { // goes through all the list
             lastNode = lastNode->next;
         }
@@ -167,17 +167,16 @@ operation* insertNodeList(operation** head, operation* node_to_insert, operation
     return *head; // returns after adding the new node to the list
 }
 
-void printLinkedList(operation** headOp)
+void printLinkedList(operation* headOp)
 {
     operation* temporary = headOp;
-    printf("%p", temporary);
     int counter = 0;
     int i = 0;
     //printf("Process %d:\n", counter);
     while (temporary != NULL)
     { // while its not at the end of the list
         counter++; // used to show what is the actual operation
-        printf("\tOperation %d:\n", counter);
+        printf("\n\tOperation %d:\n", counter);
         for (int i = 0; i < temporary->counter; i++) { // prints all the machines of the list
             printf("\t\tMachine: %d \n", temporary->machineNumber[i]);
             printf("\t\tOperation Time: %d \n", temporary->machineOperationTime[i]);
@@ -188,48 +187,23 @@ void printLinkedList(operation** headOp)
 }
 
 // jobs functions
-void newJobUserInput(job* jobListHead) {
-
-    int machineNumber = 0, machineOpTime = 0;
-    int operationQt = 0;
-    job* temporary;
-
-    printf("How many operations?.\n");
-    if (scanf("%d", &operationQt) > 0);
-    if (operationQt > 0) { // wont accept 0
-
-        for (int i = 0; i < operationQt; i++) { // ask for data
-            printf("Operation %d machine number %d:", i, i);
-            if (scanf("%d", &machineNumber) > 0);
-            printf("Operation time for machine %d:", machineNumber);
-            if (scanf("%d", &machineOpTime) > 0);
-            // create the node in the operation
-            temporary = createNewJob(operationQt); // creates the node
-            insertNodeListJob(&jobListHead, temporary, NULL); // inserts the node on the list / last position
-        }
-    }
-    free(temporary);
-}
-
-job* createNewJob(int operationQt) {
-    //create a new node / allocate space for it
-    job* node = malloc(sizeof(job));
-    node->operation = malloc(sizeof(operation) * operationQt);
-    node->next = NULL;
-    return node;
-}
 
 job* insertNodeListJob(job** headJob, job* node_to_insert, job* position) {
 
     // if head is NULL, the list is empty
     if (*headJob == NULL) { 
         *headJob = node_to_insert; // add that value to the head of the list
+        (*headJob)->previous = NULL;
     }
     else if (position != NULL) { // insert node after node in the chosen position
         // shifts the value on the desired position, one position to the right, and inserts the new node
         node_to_insert->next = position->next;
+        if (node_to_insert->next != NULL) {
+            node_to_insert->next->previous = position;
+        }
+        node_to_insert->previous = position;
         position->next = node_to_insert;
-        return node_to_insert;
+        //return node_to_insert;
     }
     else { // if the list already as one value / and no position was specified
 
@@ -240,6 +214,7 @@ job* insertNodeListJob(job** headJob, job* node_to_insert, job* position) {
         }
         // until it reaches the end and puts the value on the last position of the list
         lastNode->next = node_to_insert;
+        node_to_insert->previous = lastNode;
     }
     return *headJob; // returns after adding the new node to the list
 }
@@ -249,6 +224,8 @@ void printLinkedListJob(job* headJob) {
     int counter = 0;
     while (temporary != NULL) { // goes through the list
         counter++;
+        printf("Job %d:", counter);
+        printLinkedList(&temporary->operationCounter);
         temporary = temporary->next; // goes to the next register
     }
     printf("\n");

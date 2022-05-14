@@ -25,20 +25,19 @@ typedef struct job
 // brings all the data from the file
 job* readFile(job** jobListHead);
 // create nodes at run time
-operation* createNode(int qt);
+operation* createNodeOperation(operation* listOpHead, int machineAmount);
+
+job* createNodeJob(job* jobListHead);
 // create the list from the file
 operation* createNodeFile(int* valueReadMachine, int* valueReadOpTime, int qt);
 // insert at the head
-operation* insertNodeList(operation** head, operation* node_to_insert, operation* position);
+operation* insertNodeListOp(operation** head, operation* node_to_insert, operation* position);
 
-void printLinkedList(operation** headOp);
+void printLinkedList(operation* headOp);
 // updates the file
 void writeFile(operation* head);
 
 //JOBS
-void newJobUserInput(job* jobListHead);
-
-job* createNewJob(int operationQt);
 
 job* insertNodeListJob(job** headJob, job* node_to_insert, job* position);
 
