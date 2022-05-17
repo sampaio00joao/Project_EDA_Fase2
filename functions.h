@@ -12,32 +12,27 @@ typedef struct operation
     int* machineOperationTime;
     int* machineNumber;
     struct operation* next; // next position on the list
+    struct operation* previous; // previous position on the list
 } operation;
 
 typedef struct job
 {
-    int operationCounter;
     operation* operation; // linked list of operations
     struct job* next; // next position on the list
     struct job* previous; // previous position on the list
 }job;
 
-// brings all the data from the file
-job* readFile(job** jobListHead);
-// create nodes at run time
-operation* createNodeOperation(operation* listOpHead, int machineAmount);
+job* readFile(job* headJob);
 
-job* createNodeJob(job* jobListHead);
-// create the list from the file
-operation* createNodeFile(int* valueReadMachine, int* valueReadOpTime, int qt);
-// insert at the head
-operation* insertNodeListOp(operation** head, operation* node_to_insert, operation* position);
+job* fileListCreation(job* headJob);
 
-void printLinkedList(operation* headOp);
-// updates the file
-void writeFile(operation* head);
+job* createJob(job* jobListHead);
 
-//JOBS
+operation* createNodeOperation(int machineAmount);
+
+operation* createNodeFileOp(int* valueReadMachine, int* valueReadOpTime, int qt);
+
+operation* insertNodeListOperation(operation** head, operation* node_to_insert, operation* position);
 
 job* insertNodeListJob(job** headJob, job* node_to_insert, job* position);
 
