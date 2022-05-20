@@ -2,17 +2,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "functions.h"
+#include "userInterfaceFunctions.h"
 
 
 int main()
 {
+    // operation
+    int machineQt = 0;
+
+    // default interface variables
     int option = 0;
+
     int operationQuantity = 0;
     int counter = 0; // temporary variable to count the jobs
 
+    // job
     job* jobListHead = NULL; // Linked list
+    job* jobTemporary;
 
-    jobListHead = readFile(jobListHead); // load the values from the file
+    jobListHead = fileListCreation(jobListHead); // load the values from the file
 
     while (1) { // infinite cycle
         printf("Main Menu:\n");
@@ -33,6 +41,55 @@ int main()
                 break;
             case 2:
                 break;
+            case 3: // Modify a job
+                option = 0;
+                printf("Choose the job: ");
+                if (scanf("%d", &option) > 0);
+                jobTemporary = findNodeJob(jobListHead, option); // find the job choosen by the user
+                system("cls");
+                while (1) {
+                    system("cls");
+                    printf("Main Menu:\n");
+                    printf("1. Add an Operation\n");
+                    printf("2. Remove an Operation\n");
+                    printf("3. Modify an Operation\n");
+                    printf("4. Save the changes\n");
+                    printf("5. Show the list\n");
+                    printf("6. Maximum operation time\n");
+                    printf("7. Minimum operation time\n");
+                    printf("8. Average operation time\n");
+                    printf("\nPress 0 to go back! \n");
+                    if (scanf("%d", &option) > 0);
+                    // check if the user wants to go back
+                    if (option != 0 && option < 8) {
+                        switch (option) {
+                        default:
+                            system("cls");
+                            break;
+                        case 0:
+                            break;
+                        case 1:
+                            userInterfaceAddOperation(&jobListHead, jobTemporary, option);
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
+                        case 4:
+                            break;
+                        case 5:
+                            break;
+                        case 6:
+                            break;
+                        case 7:
+                            break;
+                        case 8:
+                            break;
+                        }
+                    }
+                    else break; // break infinite loop
+                }
+                break; // back to the job´s main menu
             case 4:// save changes
                 option = 0;
                 printf("Press 0 to go back!\n");
@@ -45,8 +102,7 @@ int main()
                 if (scanf("%d", &option) > 0) break;
             case 6: // FJSSP
                 break;
-            case 3: // Modify a job
-                break;
+            
             } // switch
             system("cls"); // clear the screen after an operation
         } // scanf

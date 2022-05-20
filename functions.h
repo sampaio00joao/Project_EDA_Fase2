@@ -1,3 +1,4 @@
+#pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,11 +23,25 @@ typedef struct job
     struct job* previous; // previous position on the list
 }job;
 
-job* readFile(job* headJob);
+void writeFile(operation* head);
+
+job* createJobFile(job** headJob, operation** headOp);
 
 job* fileListCreation(job* headJob);
 
 job* createJob(job* jobListHead);
+
+job* insertNodeListJob(job** headJob, job* node_to_insert, job* position);
+
+job* findNodeJob(job* head, int position);
+
+
+// print
+void printLinkedListJob(job* head);
+
+void printOperationList(operation* head);
+
+//operations
 
 operation* createNodeOperation(int machineAmount);
 
@@ -34,6 +49,16 @@ operation* createNodeFileOp(int* valueReadMachine, int* valueReadOpTime, int qt)
 
 operation* insertNodeListOperation(operation** head, operation* node_to_insert, operation* position);
 
-job* insertNodeListJob(job** headJob, job* node_to_insert, job* position);
+operation* insertAtHead(operation** head, operation* node_to_insert);
 
-void printLinkedListJob(job* headJob);
+int maximumOperationTime(operation* head);
+// calculate minimum operating time
+int minimumOperationTime(operation* head);
+// calculate average operating time
+int averageOperationTime(operation* head);
+// delete the node chosen by the user
+void deleteNode(operation** head, operation* value);
+// modify an operation / add a machine, delete a machine or change the operation time of a machine
+void modifyOperation(operation** head, operation* nodeToModify, int addMachine, int addOpTime, int option);
+// find the node chosen by the user
+operation* findNodeOperation(operation** head, int position);
