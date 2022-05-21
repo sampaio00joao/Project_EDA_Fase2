@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "functions.h"
+#include "userInterfaceFunctions.h"
 
 // updates the file
 void writeFile(operation* head){}
@@ -170,19 +171,46 @@ operation* createNodeOperation(int machineAmount)
 {
     operation* node = (operation*)malloc(sizeof(operation));
     int machineNumber = 0, machineOpTime = 0;
+    int block = 0, counter = 0;
 
     node->machineNumber = (int*)malloc(sizeof(int) * machineAmount);
     node->machineOperationTime = (int*)malloc(sizeof(int) * machineAmount);
     node->counter = machineAmount;
     for (int i = 0; i < machineAmount; i++) {
         printf("Machine Number: \n");
-        scanf("%d", &machineNumber);
-        printf("Machine Operation Time: \n");
-        scanf("%d", &machineOpTime);
-        node->machineNumber[i] = machineNumber;  // adds a machine
-        node->machineOperationTime[i] = machineOpTime;  // adds a machine
+        if(scanf("%d", &machineNumber) > 0);
+        block = verifyDuplicateMachine(counter, machineNumber, node);
+
+        if (block == 0) {
+            printf("Machine Operation Time: \n");
+            if (scanf("%d", &machineOpTime) > 0);
+            if (machineOpTime != 0) {
+                node->machineNumber[i] = machineNumber;  // adds a machine
+                node->machineOperationTime[i] = machineOpTime;  // adds a machine
+                counter++; // update the counter, for the amount of machines accepted
+            }
+            else {
+                printf("Operation time cant be 0. Starting Over.\n");
+                i--; // go back
+            }
+        }
+        else i--; // go back
     }//node creation loop
     return node;
+}
+
+int verifyDuplicateMachine(int counter, int machineNumber, operation* node)
+{
+    int verifyDuplicate = 0;
+    while (verifyDuplicate < counter) { 
+        if (node->machineNumber[verifyDuplicate] == machineNumber) { // checks for duplicate machines
+            printf("Machine already in use!\n");// block message
+            printf("Choose again!\n");// block message
+            return 1; // there is a duplicate, so activate the block variable
+        }
+        verifyDuplicate++;
+    }
+    return 0; // no duplicate
 }
 
 operation* createNodeFileOp(int* valueReadMachine, int* valueReadOpTime, int qt)
@@ -408,7 +436,7 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
         if (scanf("%d", &optionId) > 0) {
             counter = 0; // reset counter
             while (counter < nodeToModify->counter) {
-                if (nodeToModify->machineNumber[counter] == option) { // identify the machine chosen by the user
+                if (nodeToModify->machineNumber[counter] == optionId) { // identify the machine chosen by the user
                     printf("New Machine:\n");
                     if (scanf("%d", &optionId) > 0) { // reutilizing the option variable
                         blockCounter = 0;
@@ -424,7 +452,7 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
                             break;
                         }
                         else { // else, replace the id of the machine
-                            nodeToModify->machineNumber[pos] = option; // update the operation time of said machine
+                            nodeToModify->machineNumber[pos] = optionId; // update the operation time of said machine
                             break;
                         }
                     }
@@ -507,7 +535,6 @@ int averageOperationTime(operation* head) {
     sum = sum / count;
     return(sum);
 }
-
 
 // user interface
 void userInterfaceAddOperation(job** head, job* jobNode, int option) {
@@ -608,5 +635,63 @@ void userInterfaceAddOperation(job** head, job* jobNode, int option) {
                 }
             }
         }
+    }
+}
+
+void userInterfaceModifyOperation(operation* head, int option)
+{
+    int addMachine = 0, addOpTime = 0;
+    int optionInput = 0;
+    int counterOperation = 0;
+    operation* auxiliar = head;
+
+    // count the amount of operations
+    while (auxiliar != NULL) {
+        counterOperation++;
+        auxiliar = auxiliar->next;
+    }
+
+    if (option != 0 && option <= counterOperation) { // if the value isnt 0 or higher than the valid operations
+        system("cls");
+        printf("1. Insert new machine\n");
+        printf("2. Remove an existing machine\n");
+        printf("3. Change the operation time from a machine\n");
+        printf("4. Switch machines inside an operation\n");
+        printf("(Press 0 to cancel)\n");
+        if (scanf("%d", &optionInput) > 0);
+
+        switch (optionInput) {
+        default:
+            system("cls");
+            break; // back to menu
+        case 1: // Insert a machine to add
+            printf("Machine to add to the operation: ");
+            if (scanf("%d", &addMachine) > 0)
+                printf("Machine operation time: ");
+            if (scanf("%d", &addOpTime) > 0)
+                // sends as parameters the head, the node the user wants and the variables to update the operation
+                modifyOperation(&head, findNodeOperation(&head, option), addMachine, addOpTime, optionInput);
+            break;
+        case 2:
+            // Remove a machine
+            addMachine = 0;
+            addOpTime = 0;
+            // sends as parameters the head, the node the user wants and the variables to update the operation
+            modifyOperation(&head, findNodeOperation(&head, option), addMachine, addOpTime, optionInput);
+            break;
+        case 3:
+            // Modify the time from a machine
+            addMachine = 0;
+            addOpTime = 0;
+            // sends as parameters the head, the node the user wants and the variables to update the operation
+            modifyOperation(&head, findNodeOperation(&head, option), addMachine, addOpTime, optionInput);
+            break;
+        case 4: // modify machine id
+            addMachine = 0;
+            addOpTime = 0;
+            // sends as parameters the head, the node the user wants and the variables to update the operation
+            modifyOperation(&head, findNodeOperation(&head, option), addMachine, addOpTime, optionInput);
+            break;
+        }//switch
     }
 }

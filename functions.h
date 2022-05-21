@@ -35,7 +35,6 @@ job* insertNodeListJob(job** headJob, job* node_to_insert, job* position);
 
 job* findNodeJob(job* head, int position);
 
-
 // print
 void printLinkedListJob(job* head);
 
@@ -44,6 +43,8 @@ void printOperationList(operation* head);
 //operations
 
 operation* createNodeOperation(int machineAmount);
+
+int verifyDuplicateMachine(int counter, int machineNumber, operation* node);
 
 operation* createNodeFileOp(int* valueReadMachine, int* valueReadOpTime, int qt);
 

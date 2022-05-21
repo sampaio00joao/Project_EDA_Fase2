@@ -6,3 +6,5 @@
 #include "functions.h"
 
 void userInterfaceAddOperation(job** head, job* jobNode, int option);
+
+void userInterfaceModifyOperation(operation* head, int option);
