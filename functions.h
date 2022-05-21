@@ -33,6 +33,8 @@ job* createJob(job* jobListHead);
 
 job* insertNodeListJob(job** headJob, job* node_to_insert, job* position);
 
+void deleteNodeJob(job** head, job* value);
+
 job* findNodeJob(job* head, int position);
 
 // print

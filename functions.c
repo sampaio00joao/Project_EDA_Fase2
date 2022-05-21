@@ -117,6 +117,36 @@ job* insertNodeListJob(job** headJob, job* node_to_insert, job* position) {
     return headJob; // returns after adding the new node to the list
 }
 
+void deleteNodeJob(job** head, job* value) {
+    job* temporary; //temporary is used to free the memory
+    //key found on the head node / move to head node to the next node, and free the head.
+    if ((*head)->operation->machineNumber == value->operation->machineNumber)
+    {
+        temporary = *head;    //backup to free the memory
+        *head = (*head)->next;
+        free(temporary); // memory is free
+    }
+    else
+    {
+        job* current = *head;
+        while (current->next != NULL) // goes through all the list
+        {
+            //if true, we need to delete the current->next node
+            if (current->next->operation->machineNumber == value->operation->machineNumber) // comparing the node chosen by the user with the one on the list
+            {
+                temporary = current->next;
+                //node will be disconnected from the linked list.
+                current->next = current->next->next;
+                free(temporary); // free the memory and delete the node
+            }
+            //Otherwise, proceed through the list
+            else {
+                current = current->next;
+            }
+        }
+    }
+}
+
 job* findNodeJob(job* head, int position)
 {
     job* temporary = head;
@@ -276,6 +306,7 @@ operation* insertAtHead(operation** head, operation* node_to_insert)
 
 void deleteNode(operation** head, operation* value) {
 
+    operation* auxiliar; //temporary is used to free the memory
     operation* temporary; //temporary is used to free the memory
     //key found on the head node / move to head node to the next node, and free the head.
     if ((*head)->machineNumber == value->machineNumber)

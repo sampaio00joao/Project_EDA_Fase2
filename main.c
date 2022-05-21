@@ -35,15 +35,17 @@ int main()
         if (scanf("%d", &option) > 0) {
             system("cls"); // clear before an operation
             switch (option) {
-            case 0: // add a job
+            case 0: 
                 break;
-            case 1: // remove a job
+            case 1: // add job
                 jobListHead = insertNodeListJob(&jobListHead, createJob(jobListHead), NULL);
                 break;
-            case 2:
+            case 2: // remove a job
+                printf("Choose the job: ");
+                if (scanf("%d", &option) > 0);
+                deleteNodeJob(&jobListHead, findNodeJob(jobListHead, option));
                 break;
             case 3: // Modify a job
-                option = 0;
                 printf("Choose the job: ");
                 if (scanf("%d", &option) > 0);
                 jobTemporary = findNodeJob(jobListHead, option); // find the job choosen by the user
@@ -71,11 +73,13 @@ int main()
                             userInterfaceAddOperation(&jobListHead, jobTemporary, option);
                             break;
                         case 2: // remove operation
-                            counter = 0;
-                            printOperationList(jobTemporary->operation);
+                            counter++;
                             auxiliar = jobTemporary->operation;
-                            printf("Choose the operation to delete.(Press 0 to go back)\n");
-                            if (scanf("%d", &option) > 0)
+                            // delete the node if only one operation is inside
+                            if (jobTemporary->operation->previous != NULL) {
+                                printOperationList(jobTemporary->operation);
+                                printf("Choose the operation to delete.(Press 0 to go back)\n");
+                                if (scanf("%d", &option) > 0);
                                 if (option > 0) {
                                     while (auxiliar != NULL) { // used to restrict the user from choosing an operation that doenst exist
                                         counter++; // counts how many operations there are
@@ -85,6 +89,13 @@ int main()
                                         deleteNode(&jobTemporary->operation, findNodeOperation(&jobTemporary->operation, option));
                                     }
                                 }
+                            }
+                            else {
+                                printf("Only one operation existed, so the job was deleted\n");
+                                printf("Press any key to go back!\n");
+                                if (scanf("%d", &option) > 0) break;
+                                deleteNodeJob(&jobListHead, jobTemporary);
+                            }
                             break;
                         case 3: // modify operation
                             system("cls");
