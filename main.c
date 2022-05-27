@@ -20,6 +20,7 @@ int main()
     // job
     job* jobListHead = NULL; // Linked list
     job* jobTemporary;
+    int sum = 0; // used to receive the return value from fjssp
 
     jobListHead = fileListCreation(jobListHead); // load the values from the file
 
@@ -35,7 +36,7 @@ int main()
         if (scanf("%d", &option) > 0) {
             system("cls"); // clear before an operation
             switch (option) {
-            case 0: 
+            case 0:
                 break;
             case 1: // add job
                 jobListHead = insertNodeListJob(&jobListHead, createJob(jobListHead), NULL);
@@ -139,12 +140,14 @@ int main()
             case 5: // show the list
                 option = 0;
                 printLinkedListJob(jobListHead);
-                printf("Press 0 to go back!\n");
+                printf("Press any key to go back!\n");
                 if (scanf("%d", &option) > 0) break;
             case 6: // FJSSP
+                fjssp(jobListHead);
+                printf("\nPress any key to go back!\n");
+                if (scanf("%d", &option) > 0) break;
                 break;
-            
-            } // switch
+            }
             system("cls"); // clear the screen after an operation
         } // scanf
     } // infinite loop

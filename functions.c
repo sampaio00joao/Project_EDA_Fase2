@@ -495,25 +495,6 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
     }
 }
 
-void printLinkedList(operation* head)
-{
-    operation* temporary = head;
-    int counter = 0;
-    int i = 0;
-    //printf("Process %d:\n", counter);
-    while (temporary != NULL)
-    { // while its not at the end of the list
-        counter++; // used to show what is the actual operation
-        printf("Operation %d:\n", counter);
-        for (int i = 0; i < temporary->counter; i++) { // prints all the machines of the list
-            printf("\tMachine: %d \n", temporary->machineNumber[i]);
-            printf("\tOperation Time: %d \n", temporary->machineOperationTime[i]);
-        }
-        temporary = temporary->next;
-    }
-    printf("\n");
-}
-
 int maximumOperationTime(operation* head) {
     int sum = 0, max = 0;
     operation* temporary = head;
@@ -725,4 +706,56 @@ void userInterfaceModifyOperation(operation* head, int option)
             break;
         }//switch
     }
+}
+
+void fjssp(job* head)
+{
+    /*
+        ESCREVER EXPLICAÇÃO
+    */
+    job* temporary = head;
+    int arrMachine[8][100];
+    int lastMachineTime = 0;
+    int pos = 0;
+    int minTime = 0, counter = 0;
+    int saveMachine = 0; // store the machine choosen by the algoritm
+    int jobCounter = 0; // which job as less machines available
+    operation* auxiliar;
+
+    while (temporary != NULL) {
+        auxiliar = temporary->operation;
+        for (int i = 0; i < auxiliar->counter; i++) {
+            if (minTime >= auxiliar->machineOperationTime[i]) {
+                // if the is a lower value it will update the variable min
+                saveMachine = auxiliar->machineNumber[i];
+                minTime = auxiliar->machineOperationTime[i];
+            }
+            else if (minTime == 0) {
+                // first time updating the min value / creating the reference
+                saveMachine = auxiliar->machineNumber[i];
+                minTime = auxiliar->machineOperationTime[i];
+            }
+        }
+        arrMachine[0][counter] = saveMachine;
+        arrMachine[0][counter+1] = minTime;
+        counter++;
+        //lastMachineTime = lastMachineTime+minTime;
+        temporary = temporary->next;
+    }
+    for (int i = 0; i < 8; i++) {
+        printf("Job %d:\n", i + 1);
+        printf("\tMachine: %d\t\n", arrMachine[0][i]);
+        printf("\tOperation Time: %d\t\n", arrMachine[0][i+1]);
+    }
+}
+
+int* minimumTimeJob(operation* head, int arrMachine[8][100], int pos) {
+    
+    /*
+        ESCREVER EXPLICAÇÃO
+    */
+    
+    // save in the array
+    
+    return arrMachine; // return the updated array
 }

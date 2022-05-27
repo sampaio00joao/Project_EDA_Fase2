@@ -65,3 +65,7 @@ void deleteNode(operation** head, operation* value);
 void modifyOperation(operation** head, operation* nodeToModify, int addMachine, int addOpTime, int option);
 // find the node chosen by the user
 operation* findNodeOperation(operation** head, int position);
+
+void fjssp(job* head);
+
+int* minimumTimeJob(operation* head, int arrMachine[8][100], int pos);
