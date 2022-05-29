@@ -720,25 +720,28 @@ void fjssp(job* head)
     int pos = 0;
     int minTime = 0, counter = 0;
     int saveMachine = 0; // store the machine choosen by the algoritm
-    int jobCounter = 0; // which job as less machines available
     int counterOperation = 0;
     operation* auxiliar;
-    int operationCounter = 0;
+    int operationCounter = 0, jobCounter = 0;
 
+    // set all the positions in the array to 0
     memset(arrFjssp, 0, sizeof(arrFjssp));
     memset(arrLastPosition, 0, sizeof(arrLastPosition));
+
     // every line is a machine 
     for (int i = 0; i < 8; i++) {
         arrFjssp[i][0] = i + 1; // put all possible machines in the beggining of every line
         arrLastPosition[i][0] = i + 1;
     }
     while (temporary != NULL) {
-        auxiliar = temporary->operation;
-        operationCounter = 0;
+        auxiliar = temporary->operation; // update the operation address in the new job register
+        operationCounter = 0; // reset the counter of operations
+        jobCounter++;
         while (auxiliar != NULL) {
-            minTime = 0;
-            lastMachineTime = 0;
-            operationCounter++;
+            // all used to save the data on the arrays 
+            minTime = 0; // reset minimum time info variable
+            lastMachineTime = 0; // reset the last machine info variable
+            operationCounter++; // counter of operations
             for (int i = 0; i < auxiliar->counter; i++) {
                 if (minTime >= auxiliar->machineOperationTime[i]) {
                     // if the is a lower value it will update the variable min
@@ -751,29 +754,31 @@ void fjssp(job* head)
                     saveMachine = auxiliar->machineNumber[i];
                 }
             }
-            // insert the value choosen in the array
+            // insert the value choosen in the arrays / first time
             if (arrLastPosition[saveMachine - 1][1] == 0) {
-                arrLastPosition[saveMachine - 1][1] = minTime;
+                arrLastPosition[saveMachine - 1][1] = minTime+2;
+                arrFjssp[saveMachine - 1][1] = jobCounter; // save the operation number
+                arrFjssp[saveMachine - 1][2] = operationCounter; // save the operation number
                 for (int i = 0; i < minTime; i++) {
-                    arrFjssp[saveMachine - 1][i + 1] = minTime;
-                    arrFjssp[saveMachine - 1][i + 2] = operationCounter; // save the operation number
+                    arrFjssp[saveMachine - 1][arrLastPosition[saveMachine - 1][1]/2 + i] = minTime;
                 }
             }
-            else {
-                lastMachineTime = minTime + arrLastPosition[saveMachine - 1][1];
-                arrLastPosition[saveMachine - 1][1] = lastMachineTime;
-                for (int i = minTime; i < lastMachineTime; i++) {
-                    arrFjssp[saveMachine - 1][lastMachineTime] = minTime;
+            else { // second time and so on
+                lastMachineTime = arrLastPosition[saveMachine - 1][1];
+                arrFjssp[saveMachine - 1][lastMachineTime+1] = jobCounter; // save the operation number
+                arrFjssp[saveMachine - 1][lastMachineTime+2] = operationCounter; // save the operation number
+                lastMachineTime = arrLastPosition[saveMachine - 1][1] + 2;
+                for (int i = 1; i < minTime+1; i++) {
+                    arrFjssp[saveMachine - 1][lastMachineTime + i] = minTime;
                 }
+                lastMachineTime = minTime + arrLastPosition[saveMachine - 1][1]+2;
+                arrLastPosition[saveMachine - 1][1] = lastMachineTime;
             }
             // doesnt allow the array to overwrite the data previously stored
             
-            auxiliar = auxiliar->next;
+            auxiliar = auxiliar->next; // next register / operation list
         }
-        
-        counter++;
-        //lastMachineTime = lastMachineTime+minTime;
-        temporary = temporary->next;
+        temporary = temporary->next; // next register / job list
     }
 }
 
