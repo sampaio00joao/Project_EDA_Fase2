@@ -714,38 +714,66 @@ void fjssp(job* head)
         ESCREVER EXPLICAÇÃO
     */
     job* temporary = head;
-    int arrMachine[8][100];
+    int arrFjssp[8][100];
+    int arrLastPosition[8][2];
     int lastMachineTime = 0;
     int pos = 0;
     int minTime = 0, counter = 0;
     int saveMachine = 0; // store the machine choosen by the algoritm
     int jobCounter = 0; // which job as less machines available
+    int counterOperation = 0;
     operation* auxiliar;
+    int operationCounter = 0;
 
+    memset(arrFjssp, 0, sizeof(arrFjssp));
+    memset(arrLastPosition, 0, sizeof(arrLastPosition));
+    // every line is a machine 
+    for (int i = 0; i < 8; i++) {
+        arrFjssp[i][0] = i + 1; // put all possible machines in the beggining of every line
+        arrLastPosition[i][0] = i + 1;
+    }
     while (temporary != NULL) {
         auxiliar = temporary->operation;
-        for (int i = 0; i < auxiliar->counter; i++) {
-            if (minTime >= auxiliar->machineOperationTime[i]) {
-                // if the is a lower value it will update the variable min
-                saveMachine = auxiliar->machineNumber[i];
-                minTime = auxiliar->machineOperationTime[i];
+        operationCounter = 0;
+        while (auxiliar != NULL) {
+            minTime = 0;
+            lastMachineTime = 0;
+            operationCounter++;
+            for (int i = 0; i < auxiliar->counter; i++) {
+                if (minTime >= auxiliar->machineOperationTime[i]) {
+                    // if the is a lower value it will update the variable min
+                    minTime = auxiliar->machineOperationTime[i];
+                    saveMachine = auxiliar->machineNumber[i];
+                }
+                else if (minTime == 0) {
+                    // first time updating the min value / creating the reference
+                    minTime = auxiliar->machineOperationTime[i];
+                    saveMachine = auxiliar->machineNumber[i];
+                }
             }
-            else if (minTime == 0) {
-                // first time updating the min value / creating the reference
-                saveMachine = auxiliar->machineNumber[i];
-                minTime = auxiliar->machineOperationTime[i];
+            // insert the value choosen in the array
+            if (arrLastPosition[saveMachine - 1][1] == 0) {
+                arrLastPosition[saveMachine - 1][1] = minTime;
+                for (int i = 0; i < minTime; i++) {
+                    arrFjssp[saveMachine - 1][i + 1] = minTime;
+                    arrFjssp[saveMachine - 1][i + 2] = operationCounter; // save the operation number
+                }
             }
+            else {
+                lastMachineTime = minTime + arrLastPosition[saveMachine - 1][1];
+                arrLastPosition[saveMachine - 1][1] = lastMachineTime;
+                for (int i = minTime; i < lastMachineTime; i++) {
+                    arrFjssp[saveMachine - 1][lastMachineTime] = minTime;
+                }
+            }
+            // doesnt allow the array to overwrite the data previously stored
+            
+            auxiliar = auxiliar->next;
         }
-        arrMachine[0][counter] = saveMachine;
-        arrMachine[0][counter+1] = minTime;
+        
         counter++;
         //lastMachineTime = lastMachineTime+minTime;
         temporary = temporary->next;
-    }
-    for (int i = 0; i < 8; i++) {
-        printf("Job %d:\n", i + 1);
-        printf("\tMachine: %d\t\n", arrMachine[0][i]);
-        printf("\tOperation Time: %d\t\n", arrMachine[0][i+1]);
     }
 }
 
