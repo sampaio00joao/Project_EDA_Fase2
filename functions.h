@@ -68,4 +68,4 @@ operation* findNodeOperation(operation** head, int position);
 
 void fjssp(job* head);
 
-int* minimumTimeJob(operation* head, int arrMachine[8][100], int pos);
+void fileFjssp(job* head, int arrFjssp[8][100]);

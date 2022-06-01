@@ -37,5 +37,8 @@
     <Text Include="saveJobInfo.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="fjsspSolution.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

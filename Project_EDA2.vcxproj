@@ -147,6 +147,7 @@
     <ClInclude Include="userInterfaceFunctions.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="fjsspSolution.txt" />
     <Text Include="saveJobInfo.txt" />
     <Text Include="saveSystem.txt" />
   </ItemGroup>

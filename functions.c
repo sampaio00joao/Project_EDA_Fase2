@@ -6,8 +6,8 @@
 #include "userInterfaceFunctions.h"
 
 // updates the file
-void writeFile(operation* head){}
-
+void writeFile(operation* head){
+}
 // allocate space for the job registers
 job* createJobFile(job** headJob, operation** headOp) {
 
@@ -708,6 +708,7 @@ void userInterfaceModifyOperation(operation* head, int option)
     }
 }
 
+// fjssp
 void fjssp(job* head)
 {
     /*
@@ -760,7 +761,7 @@ void fjssp(job* head)
                 arrFjssp[saveMachine - 1][1] = jobCounter; // save the operation number
                 arrFjssp[saveMachine - 1][2] = operationCounter; // save the operation number
                 for (int i = 0; i < minTime; i++) {
-                    arrFjssp[saveMachine - 1][arrLastPosition[saveMachine - 1][1]/2 + i] = minTime;
+                    arrFjssp[saveMachine - 1][3 + i] = minTime;
                 }
             }
             else { // second time and so on
@@ -780,15 +781,73 @@ void fjssp(job* head)
         }
         temporary = temporary->next; // next register / job list
     }
+    fileFjssp(head, arrFjssp);
 }
 
-int* minimumTimeJob(operation* head, int arrMachine[8][100], int pos) {
-    
-    /*
-        ESCREVER EXPLICAÇÃO
-    */
-    
-    // save in the array
-    
-    return arrMachine; // return the updated array
+void fileFjssp(job* head, int arrFjssp[8][100]) {
+
+    FILE* file = fopen("fjsspSolution.txt", "w"); // open job info file
+    // check if the file opened
+    if (file == NULL) printf("Cannot open file."); // error
+    // safety
+    if (file != 0); else return -1;
+
+    operation* auxiliar;
+    job* temporary = head;
+    int counterOpTime = 0;
+    int value = 0, valueOpNumber = 0, valueJobNumber = 0;
+    int j = 0;
+    // print the solution on the file
+    fprintf(file, "\t\t");
+    for (int i = 0; i <= 100; i++) {
+        fprintf(file, "T%d\t\t\t", i);
+    }
+        
+    for (int i = 0; i<8; i++){
+        j = 1;
+        fprintf(file, "\n\nM%d", i+1);
+        while (j < 100) {
+            counterOpTime = 0;
+            valueJobNumber = arrFjssp[i][j]; // first value is the job number
+            if (valueJobNumber == 0){
+                fprintf(file, "\t\t..."); // 0 means there is an empty space in that memory address
+                j++;
+            }
+            else {
+                j++;
+                valueOpNumber = arrFjssp[i][j]; // second value is the operation number
+                j++;
+                value = arrFjssp[i][j]; // checks the operation time and repeats according to that value
+                while (counterOpTime < value) {
+                    fprintf(file, "\t\tJ%d", valueJobNumber);
+                    fprintf(file, "Op%d", valueOpNumber);
+                    counterOpTime++;
+                    j++;
+                }
+            }
+        }
+    }
+
+    fclose(file);
 }
+
+
+/*
+for (int j = 1; j <= 100; j++) {
+            counterOpTime = 0;
+            value = arrFjssp[i][j]; // first value is the job number
+            if(value!=0) fprintf(file, "\t\t..."); // 0 means there is an empty space in that memory address
+            else {
+                fprintf(file, "\t\tJ%d", value);
+                j++; // goes to the next position
+                valueOpNumber = arrFjssp[i][j]; // second value is the operation number
+                j++; // goes to the next position
+                value = arrFjssp[i][j]; // checks the operation time and repeats according to that value
+                while (counterOpTime < value) {
+                    fprintf(file, "\t\tOp%d", valueOpNumber);
+                    counterOpTime++;
+                }
+            }
+        }
+
+*/
