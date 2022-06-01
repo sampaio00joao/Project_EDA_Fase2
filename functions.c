@@ -892,6 +892,5 @@ void fileFjssp(job* head, int arrFjssp[8][100]) {
             counter++;
         }
     }
-
     fclose(file);
 }
