@@ -13,7 +13,6 @@ int main()
 
     // default interface variables
     int option = 0;
-
     int operationQuantity = 0;
     int counter = 0; // temporary variable to count the jobs
 
@@ -29,27 +28,78 @@ int main()
         printf("1. Add a job\n");
         printf("2. Remove a Job\n");
         printf("3. Modify a Job\n");
-        printf("4. Save Jobs List\n");
+        printf("4. Save process plan\n");
         printf("5. Show the list\n");
         printf("6. FJSSP Solution Proposal\n");
-
         if (scanf("%d", &option) > 0) {
             system("cls"); // clear before an operation
             switch (option) {
             case 0:
                 break;
             case 1: // add job
-                jobListHead = insertNodeListJob(&jobListHead, createJob(jobListHead), NULL);
+                counter = 0;
+                jobTemporary = jobListHead;
+                while (jobTemporary != NULL) {
+                    counter++; // job counter 
+                    jobTemporary = jobTemporary->next;
+                }
+                if (counter < 8) {
+                    system("cls");
+                    printf("Choose the option: (Press 0 to cancel)\n");
+                    printf("1. Insert at the tail of the list.\n");
+                    printf("2. Insert at the head of the list.\n");
+                    printf("3. Insert on a specified position.\n");
+                    if (scanf("%d", &option) > 0);
+                    switch (option) {
+                    default: break;
+                    case 1: // tail
+                        insertNodeListJob(&jobListHead, createJob(jobListHead), NULL);
+                        printf("\nUpdated!\n");
+                        break;
+                    case 2: // head
+                        insertAtHeadJob(&jobListHead, createJob(jobListHead), NULL);
+                        printf("\nUpdated!\n");
+                        break;
+                    case 3: // position
+                        printf("\nChoose the position: ");
+                        if (scanf("%d", &option) > 0);
+                        // prevents a bug in the code
+                        if (option > 0 && option <= 8) {
+                            if (option == 1) insertAtHeadJob(&jobListHead, createJob(jobListHead), NULL);
+                            else insertNodeListJob(&jobListHead, createJob(jobListHead), findNodeJob(&jobListHead, option - 1));
+                            printf("\nUpdated!\n");
+                        }
+                        else printf("\nChoose a valid position, from 1 to 8.\nGoing back to Menu\n");
+                        break;
+                    }
+                }
+                else printf("Maximum of 8 jobs reached");
+                printf("\nPress any key to go back!\n");
+                if (scanf("%d", &option) > 0);
                 break;
             case 2: // remove a job
+                counter = 0;
                 printf("Choose the job: ");
+                // updates the amount of jobs in the list, to prevent the user from choosing one that doesnt exist
+                jobTemporary = jobListHead;
+                while (jobTemporary != NULL) { 
+                    counter++; // job counter 
+                    jobTemporary = jobTemporary->next;
+                }
+                if (scanf("%d", &option) > 0); // return value protection
+                if (option > 0 && option <= counter) { // prevents from choosing a job that doesnt exist
+                    deleteNodeJob(&jobListHead, findNodeJob(&jobListHead, option-1));
+                    printf("Job Sucessfully deleted!");
+                }
+                else printf("Cant choose a node that doesnt exist");
+                printf("\nPress any key to go back!\n");
                 if (scanf("%d", &option) > 0);
-                deleteNodeJob(&jobListHead, findNodeJob(jobListHead, option));
                 break;
             case 3: // Modify a job
+                counter = 0;
                 printf("Choose the job: ");
                 if (scanf("%d", &option) > 0);
-                jobTemporary = findNodeJob(jobListHead, option); // find the job choosen by the user
+                jobTemporary = findNodeJob(&jobListHead, option); // find the job choosen by the user
                 system("cls");
                 while (1) {
                     system("cls");
@@ -72,6 +122,8 @@ int main()
                             break;
                         case 1: // add operation
                             userInterfaceAddOperation(&jobListHead, jobTemporary, option);
+                            printf("\nPress any key to go back!\n");
+                            if (scanf("%d", &option) > 0);
                             break;
                         case 2: // remove operation
                             counter++;
@@ -110,7 +162,7 @@ int main()
                         case 5: // show list
                             printOperationList(jobTemporary->operation);
                             printf("Press any key to go back!\n");
-                            if (scanf("%d", &option) > 0) break;
+                            if (scanf("%d", &option) > 0);
                             break;
                         case 6: // maximum
                             printf("Maximum job time:\t%d\n", maximumOperationTime(jobTemporary->operation));
@@ -133,7 +185,9 @@ int main()
                 }
                 break; // back to the job´s main menu
             case 4:// save changes
+                counter = 0;
                 option = 0;
+                writeFile(jobListHead);
                 printf("Press 0 to go back!\n");
                 if (scanf("%d", &option) > 0) break;
                 break;
@@ -144,6 +198,7 @@ int main()
                 if (scanf("%d", &option) > 0) break;
             case 6: // FJSSP
                 fjssp(jobListHead);
+                printf("\nFJSSP file updated!");
                 printf("\nPress any key to go back!\n");
                 if (scanf("%d", &option) > 0) break;
                 break;

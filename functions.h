@@ -23,7 +23,7 @@ typedef struct job
     struct job* previous; // previous position on the list
 }job;
 
-void writeFile(operation* head);
+void writeFile(job* head);
 
 job* createJobFile(job** headJob, operation** headOp);
 
@@ -33,9 +33,11 @@ job* createJob(job* jobListHead);
 
 job* insertNodeListJob(job** headJob, job* node_to_insert, job* position);
 
+job* insertAtHeadJob(job** head, job* node_to_insert);
+
 void deleteNodeJob(job** head, job* value);
 
-job* findNodeJob(job* head, int position);
+job* findNodeJob(job** head, int position);
 
 // print
 void printLinkedListJob(job* head);
@@ -52,7 +54,7 @@ operation* createNodeFileOp(int* valueReadMachine, int* valueReadOpTime, int qt)
 
 operation* insertNodeListOperation(operation** head, operation* node_to_insert, operation* position);
 
-operation* insertAtHead(operation** head, operation* node_to_insert);
+operation* insertAtHeadOperation(operation** head, operation* node_to_insert);
 
 int maximumOperationTime(operation* head);
 // calculate minimum operating time

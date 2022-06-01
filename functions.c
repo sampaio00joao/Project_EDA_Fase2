@@ -6,8 +6,45 @@
 #include "userInterfaceFunctions.h"
 
 // updates the file
-void writeFile(operation* head){
+void writeFile(job* head){
+
+    int counter = 0;
+    job* auxiliar = head;
+    operation* temporary;
+
+    FILE* fileOp = fopen("saveSystem.txt", "w"); // open file in writing mode
+    if (fileOp == NULL) {
+        printf("Cannot open file."); // error if it fails to open
+    }
+    FILE* fileJob = fopen("saveJobInfo.txt", "w"); // open file in writing mode
+    if (fileJob == NULL) {
+        printf("Cannot open file."); // error if it fails to open
+    }
+    // safety
+    if (fileJob != 0); else return -1;
+    if (fileOp != 0); else return -1;
+
+    while (auxiliar != NULL) {
+        temporary = auxiliar->operation; // access the data from the linked list 
+        while (temporary != NULL) {
+            counter++; // to save the amount of operations
+            fprintf(fileOp, "%d ", temporary->counter); // used as a reference when reading
+            for (int i = 0; i < temporary->counter; i++) {
+                // prints all the machines and their operation time inside every operation/node
+                fprintf(fileOp, "%d ", temporary->machineNumber[i]);
+                fprintf(fileOp, "%d ", temporary->machineOperationTime[i]);
+            }
+            fprintf(fileOp, "\n", '\n');
+            temporary = temporary->next; // continues through the list
+        }
+        fprintf(fileJob, "%d \n", counter);
+        counter = 0; // reset
+        auxiliar = auxiliar->next;
+    }
+    fclose(fileOp); // closes the file in the end
+    fclose(fileJob);
 }
+
 // allocate space for the job registers
 job* createJobFile(job** headJob, operation** headOp) {
 
@@ -71,8 +108,7 @@ job* createJob(job* jobListHead)
     printf("How many operations?.\n");
     if (scanf("%d", &operationQt) > 0);
     if (operationQt > 0) { // wont accept 0 operations
-        // allocating space for the linked list of operations
-        // temporary->operation = (operation*)malloc(sizeof(operation));
+        // declaring the linked list
         temporary->operation = NULL; // linked list of operations
         for (int i = 0; i < operationQt; i++) { // ask for data
             printf("\nOperation %d:\nHow many machines?\n", i + 1);
@@ -80,13 +116,16 @@ job* createJob(job* jobListHead)
             if (machineAmount > 0) { // wont accept 0 machines
                 auxiliar = createNodeOperation(machineAmount);
                 insertNodeListOperation(&temporary->operation, auxiliar, NULL);
-            }//machineAmount scanf
-        }//for loop operation quantity
+            }
+        }
     }
+    temporary->next = NULL;
+    temporary->previous = NULL;
     return temporary;
 }
 
 job* insertNodeListJob(job** headJob, job* node_to_insert, job* position) {
+
 
     // if head is NULL, the list is empty
     if (*headJob == NULL) {
@@ -94,7 +133,8 @@ job* insertNodeListJob(job** headJob, job* node_to_insert, job* position) {
         (*headJob)->next = NULL;
         (*headJob)->previous = NULL;
     }
-    else if (position != NULL) { // insert node after node in the chosen position
+    else if (position != NULL) { 
+        // insert node after node in the chosen position
         // shifts the value on the desired position, one position to the right, and inserts the new node
         node_to_insert->next = position->next;
         if (node_to_insert->next != NULL) {
@@ -102,10 +142,10 @@ job* insertNodeListJob(job** headJob, job* node_to_insert, job* position) {
         }
         node_to_insert->previous = position;
         position->next = node_to_insert;
-        //return node_to_insert;
     }
     else { // if the list already as one value / and no position was specified
         job* lastNode = *headJob; // the last node points to the head of the list
+
         while (lastNode->next != NULL) { // goes through all the list
             lastNode = lastNode->next;
         }
@@ -114,7 +154,17 @@ job* insertNodeListJob(job** headJob, job* node_to_insert, job* position) {
         node_to_insert->next = NULL;
         node_to_insert->previous = lastNode;
     }
-    return headJob; // returns after adding the new node to the list
+    return *headJob; // returns after adding the new node to the list
+}
+
+job* insertAtHeadJob(job** head, job* node_to_insert)
+{
+    // swap method
+    node_to_insert->next = *head;
+    (*head)->previous = node_to_insert;
+    // by passing a pointer to a pointer to the function, we are able to change the head value inside the function
+    *head = node_to_insert;
+    return node_to_insert; // returns the node inserted at the head of the list
 }
 
 void deleteNodeJob(job** head, job* value) {
@@ -132,12 +182,13 @@ void deleteNodeJob(job** head, job* value) {
         while (current->next != NULL) // goes through all the list
         {
             //if true, we need to delete the current->next node
-            if (current->next->operation->machineNumber == value->operation->machineNumber) // comparing the node chosen by the user with the one on the list
+            if (current->operation->machineNumber == value->operation->machineNumber) // comparing the node chosen by the user with the one on the list
             {
                 temporary = current->next;
                 //node will be disconnected from the linked list.
                 current->next = current->next->next;
                 free(temporary); // free the memory and delete the node
+                break;
             }
             //Otherwise, proceed through the list
             else {
@@ -147,9 +198,9 @@ void deleteNodeJob(job** head, job* value) {
     }
 }
 
-job* findNodeJob(job* head, int position)
+job* findNodeJob(job** head, int position)
 {
-    job* temporary = head;
+    job* temporary = *head;
     // receives the head / no need for double pointer since we dont need to apply changes to the head.
     int counter = 0; // counter used to count repeat the loop until it reaches the operation
 
@@ -194,9 +245,7 @@ void printOperationList(operation* head) {
     }
 }
 
-
 // operations 
-
 operation* createNodeOperation(int machineAmount)
 {
     operation* node = (operation*)malloc(sizeof(operation));
@@ -295,10 +344,11 @@ operation* insertNodeListOperation(operation** head, operation* node_to_insert, 
     return *head; // returns after adding the new node to the list
 }
 
-operation* insertAtHead(operation** head, operation* node_to_insert)
+operation* insertAtHeadOperation(operation** head, operation* node_to_insert)
 {
     // swap method
     node_to_insert->next = *head;
+    (*head)->previous = node_to_insert;
     // by passing a pointer to a pointer to the function, we are able to change the head value inside the function
     *head = node_to_insert;
     return node_to_insert; // returns the node inserted at the head of the list
@@ -366,26 +416,33 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
     int blockCounter = 0;
     int blockFlag = 0;
     int optionId = 0;
-
+    
     switch (option) {
     case 1: // add new item
         //adds the new machine and operation time, to the last position inside the operation
-        while (counter < nodeToModify->counter) { // verification to block the existence of the same machine in the same operation
-            if (addMachine == nodeToModify->machineNumber[counter]) {
-                ref++;
-                counter++;
+        counter = 0;
+        if (nodeToModify->counter < 8) {
+            while (counter < nodeToModify->counter) { // verification to block the existence of the same machine in the same operation
+                if (addMachine == nodeToModify->machineNumber[counter]) {
+                    ref++;
+                    counter++;
+                }
+                else {
+                    counter++;
+                }
             }
-            else {
-                counter++;
+            if (ref == 0) { // if the machine the user wants to input doesnt exist, add the machine to the operation
+                nodeToModify->machineNumber[nodeToModify->counter] = addMachine;
+                nodeToModify->machineOperationTime[nodeToModify->counter] = addOpTime;
+                nodeToModify->counter++; // update the counter variable
             }
         }
-        if (ref == 0) { // if the machine the user wants to input doesnt exist, add the machine to the operation
-            nodeToModify->machineNumber[nodeToModify->counter] = addMachine;
-            nodeToModify->machineOperationTime[nodeToModify->counter] = addOpTime;
-            nodeToModify->counter++; // update the counter variable
-        }
+        else printf("Operation Full!\n");
+        printf("Press any key to go back!\n");
+        if (scanf("%d", &option) > 0) break;
         break;
     case 2: // remove machine 
+        counter = 0;
         option = 0;
         printf("Machine to delete: ");
         while (counter < nodeToModify->counter) {
@@ -432,6 +489,7 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
         break;
 
     case 3: // modify the operation time from a machine
+        counter = 0;
         option = 0;
         for (int i = 0; i < nodeToModify->counter; i++) {
             if (nodeToModify->machineNumber[i] == option) { // identify the machine chosen by the user
@@ -455,11 +513,10 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
         }
         break;
     case 4: // modify machine Id
-        // option = 0;
         counter = 0;
         pos = 0;
         printf("Choose a machine:");
-        while (counter < nodeToModify->counter) {
+        while (counter < nodeToModify->counter) { // print all the machines available
             printf("{%d} ", nodeToModify->machineNumber[counter]);
             counter++;
         }
@@ -472,7 +529,7 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
                     if (scanf("%d", &optionId) > 0) { // reutilizing the option variable
                         blockCounter = 0;
                         while (blockCounter < nodeToModify->counter) { // search for duplicate
-                            if (option == nodeToModify->machineNumber[blockCounter]) { // if there is one
+                            if (optionId == nodeToModify->machineNumber[blockCounter]) { // if there is one
                                 printf("Machine already in use!\n");
                                 blockFlag = 1; // block the option
                             }
@@ -552,101 +609,111 @@ int averageOperationTime(operation* head) {
 void userInterfaceAddOperation(job** head, job* jobNode, int option) {
     bool breakLoop = false; // breaks the infinite loop
     int machineQuantity = 0;
+    int counter = 0; // counts the machines inside the operation
     operation* temporary;
-
-    while (breakLoop != true) {
-        switch (option)
-        {
-        default:
-            system("cls");
-            break;
-        case 1: // add operation
-            option = 0;
-            while (breakLoop != true) {
+    operation* auxiliar = jobNode->operation;
+    while (auxiliar != NULL) {
+        counter++;
+        auxiliar = auxiliar->next;
+    }
+    if (counter < 8) {
+        while (breakLoop != true) {
+            switch (option)
+            {
+            default:
                 system("cls");
-                printf("Choose the option: (Press 0 to cancel)\n");
-                printf("1. Insert at the tail of the list.\n");
-                printf("2. Insert at the head of the list.\n");
-                printf("3. Insert on a specified position.\n");
-                if (scanf("%d", &option) > 0) {
-                    switch (option) {
-                    default:
-                        system("cls");
-                        break;
-                    case 0:
-                        breakLoop = true; // break the loop
-                        break;
-                    case 1: // Insert at the tail of the list
-                        system("cls");
-                        printf("(Choose between 1 and 8, or the program will reset)\n");
-                        printf("How many machines?.\n");
-                        if (scanf("%d", &machineQuantity) > 0) {
-                            if (machineQuantity > 0 && machineQuantity < 8) {
-                                temporary = createNodeOperation(machineQuantity); // creates the node and returns it
-                                /*
-                                Function parameters:
-                                    1. The address of the operation list inside the specified job register;
-                                    2. The node returned previously;
-                                    3. NULL because im not specifying a position to put the new node.
-                                */
-                                insertNodeListOperation(&jobNode->operation, temporary, NULL); // inserts the node on the list / last position
-                                system("cls");
-                            }
-                            else break; // resets if and ivalid number was inputed
-                        }
-                        break;
-                    case 2: // Insert at the head of the list
-                        system("cls");
-                        printf("How many machines?.\n");
-                        if (scanf("%d", &machineQuantity) > 0) {
-                            if (machineQuantity > 0) {
+                break;
+            case 1: // add operation
+                option = 0;
+                while (breakLoop != true) {
+                    system("cls");
+                    printf("Choose the option: (Press 0 to cancel)\n");
+                    printf("1. Insert at the tail of the list.\n");
+                    printf("2. Insert at the head of the list.\n");
+                    printf("3. Insert on a specified position.\n");
+                    if (scanf("%d", &option) > 0) {
+                        switch (option) {
+                        default:
+                            system("cls");
+                            break;
+                        case 0:
+                            breakLoop = true; // break the loop
+                            break;
+                        case 1: // Insert at the tail of the list
+                            system("cls");
+                            printf("(Choose between 1 and 8, or the program will reset)\n");
+                            printf("How many machines?.\n");
+                            if (scanf("%d", &machineQuantity) > 0) {
                                 if (machineQuantity > 0 && machineQuantity < 8) {
                                     temporary = createNodeOperation(machineQuantity); // creates the node and returns it
                                     /*
                                     Function parameters:
                                         1. The address of the operation list inside the specified job register;
                                         2. The node returned previously;
-                                        I use a special function to add to the head of the list, since i cant do it
-                                        by specifying a position.
+                                        3. NULL because im not specifying a position to put the new node.
                                     */
-                                    insertAtHead(&jobNode->operation, temporary);
+                                    insertNodeListOperation(&jobNode->operation, temporary, NULL); // inserts the node on the list / last position
                                     system("cls");
                                 }
                                 else break; // resets if and ivalid number was inputed
                             }
-                        }
-                        break;
-                    case 3: // Insert on a specified position
-                        system("cls");
-                        //MUDAR
-                        temporary = jobNode;
-                        printf("Job info:\n");
-                        printOperationList(jobNode->operation); // show the operation list to help the user
-                        printf("\nChoose the position?.\n");
-                        if (scanf("%d", &option) > 0);
-                        printf("How many machines?.\n");
-                        if (scanf("%d", &machineQuantity) > 0) {
-                            if (machineQuantity > 0) {
-                                if (machineQuantity > 0 && machineQuantity < 8) {
-                                    temporary = createNodeOperation(machineQuantity); // creates the node and returns it
-                                    /*
-                                    Function parameters:
-                                        1. The address of the operation list inside the specified job register;
-                                        2. The node returned previously;
-                                        3. Find the node in the specified position, and the return value is the node found.
-                                    */
+                            break;
+                        case 2: // Insert at the head of the list
+                            system("cls");
+                            printf("How many machines?.\n");
+                            if (scanf("%d", &machineQuantity) > 0) {
+                                if (machineQuantity > 0) {
+                                    if (machineQuantity > 0 && machineQuantity < 8) {
+                                        temporary = createNodeOperation(machineQuantity); // creates the node and returns it
+                                        /*
+                                        Function parameters:
+                                            1. The address of the operation list inside the specified job register;
+                                            2. The node returned previously;
+                                            I use a special function to add to the head of the list, since i cant do it
+                                            by specifying a position.
+                                        */
+                                        insertAtHeadOperation(&jobNode->operation, temporary);
+                                        system("cls");
+                                    }
+                                    else break; // resets if and ivalid number was inputed
+                                }
+                            }
+                            break;
+                        case 3: // Insert on a specified position
+                            system("cls");
+                            //MUDAR8
+                            temporary = jobNode;
+                            printf("Job info:\n");
+                            printOperationList(jobNode->operation); // show the operation list to help the user
+                            printf("\nChoose the position?.\n");
+                            if (scanf("%d", &option) > 0);
+                            printf("How many machines?.\n");
+                            if (scanf("%d", &machineQuantity) > 0) {
+                                if (machineQuantity > 0) {
+                                    if (machineQuantity > 0 && machineQuantity < 8) {
+                                        temporary = createNodeOperation(machineQuantity); // creates the node and returns it
+                                        /*
+                                        Function parameters:
+                                            1. The address of the operation list inside the specified job register;
+                                            2. The node returned previously;
+                                            3. Find the node in the specified position, and the return value is the node found.
+                                        */
 
-                                    insertNodeListOperation(&jobNode->operation, temporary, findNodeOperation(&jobNode->operation, option - 1)); // inserts the node on the list / last position
-                                    system("cls");
+                                        insertNodeListOperation(&jobNode->operation, temporary, findNodeOperation(&jobNode->operation, option - 1)); // inserts the node on the list / last position
+                                        system("cls");
+                                    }
+                                    else break; // resets if and ivalid number was inputed
                                 }
-                                else break; // resets if and ivalid number was inputed
                             }
+                            break;
                         }
-                        break;
                     }
                 }
             }
         }
+    }
+    else {
+        printf("Cant add more operations!");
     }
 }
 
@@ -711,9 +778,6 @@ void userInterfaceModifyOperation(operation* head, int option)
 // fjssp
 void fjssp(job* head)
 {
-    /*
-        ESCREVER EXPLICAÇÃO
-    */
     job* temporary = head;
     int arrFjssp[8][100]; // array with the fjssp solution
     int arrLastPosition[8][2]; // always record the last position with a value for every machine
@@ -757,7 +821,7 @@ void fjssp(job* head)
             }
             // insert the value choosen in the arrays / first time
             if (arrLastPosition[saveMachine - 1][1] == 0) {
-                arrLastPosition[saveMachine - 1][1] = minTime+2;
+                arrLastPosition[saveMachine - 1][1] = minTime+2; // plus 2 because of the job and operation number
                 arrFjssp[saveMachine - 1][1] = jobCounter; // save the operation number
                 arrFjssp[saveMachine - 1][2] = operationCounter; // save the operation number
                 for (int i = 0; i < minTime; i++) {
@@ -768,15 +832,14 @@ void fjssp(job* head)
                 lastMachineTime = arrLastPosition[saveMachine - 1][1];
                 arrFjssp[saveMachine - 1][lastMachineTime+1] = jobCounter; // save the operation number
                 arrFjssp[saveMachine - 1][lastMachineTime+2] = operationCounter; // save the operation number
-                lastMachineTime = arrLastPosition[saveMachine - 1][1] + 2;
+                lastMachineTime = arrLastPosition[saveMachine - 1][1] + 2; // plus 2 because of the job and operation number
                 for (int i = 1; i < minTime+1; i++) {
                     arrFjssp[saveMachine - 1][lastMachineTime + i] = minTime;
                 }
-                lastMachineTime = minTime + arrLastPosition[saveMachine - 1][1]+2;
-                arrLastPosition[saveMachine - 1][1] = lastMachineTime;
+                lastMachineTime = minTime + arrLastPosition[saveMachine - 1][1]+2; // plus 2 because of the job and operation number
+                arrLastPosition[saveMachine - 1][1] = lastMachineTime; // update with the new last position
             }
             // doesnt allow the array to overwrite the data previously stored
-            
             auxiliar = auxiliar->next; // next register / operation list
         }
         temporary = temporary->next; // next register / job list
