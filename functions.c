@@ -461,30 +461,27 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
                 counter++;
             }
             // starts on the position to delete, and reorganizes the arrays 
-            if (pos != 0) {
-                for (counter = pos; counter < nodeToModify->counter; counter++) {
-                    bufferMachine[counter] = bufferMachine[counter + 1];
-                    bufferOpTime[counter] = bufferOpTime[counter + 1];
-                }
-                nodeToModify->counter = counter - 1; // decrease one number on the operation counter variable
-                counter = 0;
-                while (counter < nodeToModify->counter) { // fill the node again without the deleted machine and op. time
-                    nodeToModify->machineNumber[counter] = bufferMachine[counter];
-                    nodeToModify->machineOperationTime[counter] = bufferOpTime[counter];
-                    counter++;
-                }
-
-                // make sure to delete the operation if we delete the last machine available
-                if (nodeToModify->counter != 0) { // true if the operation as one or more machines available
-                    printf("Machine deleted\n");
-                }
-                else { // delete the operation since there is no machines left
-                    printf("Last machine available deleted.\n");
-                    printf("Operation deleted.\n");
-                    deleteNode(head, nodeToModify); // function call to delete, sending nodeToModify, as the node to delete parameter.
-                }
+            for (counter = pos; counter < nodeToModify->counter; counter++) {
+                bufferMachine[counter] = bufferMachine[counter + 1];
+                bufferOpTime[counter] = bufferOpTime[counter + 1];
             }
-            else break;
+            nodeToModify->counter = counter - 1; // decrease one number on the operation counter variable
+            counter = 0;
+            while (counter < nodeToModify->counter) { // fill the node again without the deleted machine and op. time
+                nodeToModify->machineNumber[counter] = bufferMachine[counter];
+                nodeToModify->machineOperationTime[counter] = bufferOpTime[counter];
+                counter++;
+            }
+
+            // make sure to delete the operation if we delete the last machine available
+            if (nodeToModify->counter != 0) { // true if the operation as one or more machines available
+                printf("Machine deleted\n");
+            }
+            else { // delete the operation since there is no machines left
+                printf("Last machine available deleted.\n");
+                printf("Operation deleted.\n");
+                deleteNode(head, nodeToModify); // function call to delete, sending nodeToModify, as the node to delete parameter.
+            }
         }
         break;
 
@@ -779,7 +776,7 @@ void userInterfaceModifyOperation(operation* head, int option)
 void fjssp(job* head)
 {
     job* temporary = head;
-    int arrFjssp[8][91]; // array with the fjssp solution
+    int arrFjssp[8][101]; // array with the fjssp solution
     int arrAdressOperation[8][8];
     int arrLastPosition[8][2];
     int lastMachineTime = 0; // used to update the array arrLastPosition 
@@ -805,25 +802,29 @@ void fjssp(job* head)
         arrFjssp[i][0] = i + 1; // put all possible machines in the beggining of every line
         arrLastPosition[i][0] = i + 1; // put all possible machines in the beggining of every line
     }
+    // saves all the operation addresses
     for (int j = 0; j < 8; j++) {
-        auxiliar = temporary->operation;
-        for (int i = 0; i < 8; i++) {
-            if (auxiliar != NULL) {
-                arrAdressOperation[j][i] = auxiliar;
-                auxiliar = auxiliar->next;
+        // this condition prevents the program from triggering an exception / different process plans with less than 8 jobs
+        if (temporary != NULL) { 
+            auxiliar = temporary->operation;
+            for (int i = 0; i < 8; i++) {
+                if (auxiliar != NULL) { // prevents the program from acessing operations that some jobs wont do 
+                    arrAdressOperation[j][i] = auxiliar;
+                    auxiliar = auxiliar->next;
+                }
             }
+            temporary = temporary->next;
         }
-        temporary = temporary->next;
     }
-    for (int i = 0; i < 8; i++) {
-        counterOp++;
-        jobCounter = 0;
-        block = 0;
+    // fjssp
+    for (int i = 0; i < 8; i++) { // 8 operations
+        counterOp++; 
+        jobCounter = 0; // reset job counting for every new job
+        block = 0; 
         for (int j = 0; j < 8; j++) {
             jobCounter++;
-            auxiliar = arrAdressOperation[j][operationCounter];
+            auxiliar = arrAdressOperation[j][operationCounter]; // acess to the address
             if (auxiliar != NULL) {
-                // all used to save the data on the arrays 
                 minTime = 0; // reset minimum time info variable
                 for (int i = 0; i < auxiliar->counter; i++) {
                     if (minTime >= auxiliar->machineOperationTime[i]) {
@@ -838,7 +839,9 @@ void fjssp(job* head)
                     }
                 }
                 if (block == 0) {
-                    if (counterOp > 1) {
+                    if (counterOp > 1) { // only true on the second operation and so on, but only on the first machine choosen
+                        // this will update the last position array, to define a new
+                        // reference / prevents the program from doing more than one operation at a time
                         for (int i = 0; i < 8; i++) {
                             saveValue = arrLastPosition[i][1];
                             if (previousValue == 0) {
@@ -848,18 +851,19 @@ void fjssp(job* head)
                                 previousValue = saveValue;
                             }
                         }
-                        for (int i = 0; i < 8; i++) {
+                        for (int i = 0; i < 8; i++) { // update all the positions with the new reference
+                            // the new reference is equal to the last position of the last machine used
                             arrLastPosition[i][1] = previousValue;
                         }
                     }
-                    block = 1;
+                    block = 1; // blocks the entry until a new operation is being done
                 }
                 // insert the value choosen in the arrays / first time
                 if (arrLastPosition[saveMachine - 1][1] == 0) {
                     for (int i = 1; i < minTime + 1; i++) {
                         // mulstiplying by 10 allows me to store both job and operation indicators
                         arrFjssp[saveMachine - 1][arrLastPosition[saveMachine - 1][1] + i] = (jobCounter * 10) + counterOp;
-                        lastMachineTime++;
+                        lastMachineTime++; // update lastMachineTime
                     }
                     previousMachine = saveMachine;
                     arrLastPosition[saveMachine - 1][1] = lastMachineTime + 1;
@@ -877,22 +881,25 @@ void fjssp(job* head)
                 }
             }
         }
-        operationCounter++;
+       operationCounter++;
     }
+    fileFjssp(arrFjssp);
+}
+
+void fileFjssp(int arrFjssp[][101])
+{
+    int block = 0;
+    int value = 0;
 
     FILE* file = fopen("fjsspSolution.txt", "w"); // open job info file
     // check if the file opened
     if (file == NULL) printf("Cannot open file."); // error
     // safety
     if (file != 0); else return -1;
-
-    int counterOpTime = 0;
-    int value = 0, valueOpNumber = 0, valueJobNumber = 0;
-    int j = 0;
-    int counter = 0;
+    
     // print the solution on the file
     fprintf(file, "\t\t");
-    for (int i = 0; i <= 90; i++) {
+    for (int i = 1; i <= 100; i++) {
         if (i < 100) {
             fprintf(file, "T%d\t\t\t", i);
         }
@@ -905,12 +912,12 @@ void fjssp(job* head)
     for (int i = 0; i < 8; i++) {
         fprintf(file, "\n\nM%d", i + 1);
         block = 0;
-        for (int j = 1; j < 91; j++) {
+        for (int j = 1; j < 101; j++) {
             value = arrFjssp[i][j]; // checks the operation time and repeats according to that
             if (value == 0) {
                 fprintf(file, "\t\t...\t"); // 0 means there is an empty space in that memory address
             }
-            else{
+            else {
                 while (value > 0) { // separate the values
                     if (block == 0) {
                         digitOp = value % 10; // operation digit

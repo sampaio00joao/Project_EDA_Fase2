@@ -70,4 +70,4 @@ operation* findNodeOperation(operation** head, int position);
 
 void fjssp(job* head);
 
-void fileFjssp(job* head, int arrFjssp[8][100]);
+void fileFjssp(int arrFjssp[][91]);
