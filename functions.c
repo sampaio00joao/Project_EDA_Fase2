@@ -173,7 +173,6 @@ void deleteNodeJob(job** head, job* value) {
     if ((*head)->operation->machineNumber == value->operation->machineNumber)
     {
         temporary = *head;    //backup to free the memory
-        *head = (*head)->next;
         free(temporary); // memory is free
     }
     else

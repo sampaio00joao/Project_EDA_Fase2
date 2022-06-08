@@ -139,7 +139,7 @@ int main()
                                 if (scanf("%d", &option) > 0);
                                 break;
                             case 2: // remove operation
-                                counter++;
+                                counter = 0;
                                 auxiliar = jobTemporary->operation;
                                 // delete the node if only one operation is inside
                                 if (jobTemporary->operation->previous == NULL) {
