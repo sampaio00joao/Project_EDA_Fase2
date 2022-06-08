@@ -837,7 +837,7 @@ void fjssp(job* head)
                         saveMachine = auxiliar->machineNumber[i];
                     }
                 }
-                if (block == 0) {
+                if (block == 0) { // blocks the program from entering the next condition
                     if (counterOp > 1) { // only true on the second operation and so on, but only on the first machine choosen
                         // this will update the last position array, to define a new
                         // reference / prevents the program from doing more than one operation at a time
