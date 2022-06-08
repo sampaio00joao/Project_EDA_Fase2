@@ -903,7 +903,7 @@ void fileFjssp(int arrFjssp[][101])
             fprintf(file, "T%d\t\t\t", i);
         }
         else {
-            fprintf(file, "T%d\t\t", i);
+            fprintf(file, "T%d\t\t", i); // prevents an error
         }
     }
     int digitJob = 0;
